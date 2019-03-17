@@ -31,14 +31,17 @@ def RRClist():
 
 def approvalTime(includeList):
 
-    includeList = i
+    i = includeList
     approvalTimes = []
     exportStatusList = ['Exported/Not Paid', 'Exported/Paid', 'Exported/Partially Paid']
-
+    ERsAccountedFor = []
+    lessThanThreeDaysCounter = 0
 
 
     for row in range(4, sheet.max_row + 1):
 
+
+        ERID = (sheet['B' + str(row)].value)
         submittedDate = (sheet['C' + str(row)].value)
         exportedDate = (sheet['W' + str(row)].value)
         RRC = (sheet['Y' + str(row)].value)
@@ -47,10 +50,30 @@ def approvalTime(includeList):
 
         if RRC in i:
             if exportStatus in exportStatusList:
-                #  exporteddate - submittedDate
-                # add value teo approvalTimes list
+                if  ERID not in ERsAccountedFor:
+                    ERsAccountedFor.append(ERID)
+                    try:
+                        daysPassed = (exportedDate - submittedDate).days
 
-                
+                        approvalTimes.append(daysPassed)
+    
+                    except:
+                        print('failed %s' % ERID)
+                    if daysPassed <= 3:
+                                lessThanThreeDaysCounter += 1
+
+    average = sum(approvalTimes)/len(approvalTimes)
+
+    lessThanThreePercent = lessThanThreeDaysCounter/len(approvalTimes)
+
+
+    approvalTimeResults = {'Average': average, 'LessThan3Days': lessThanThreePercent}
+
+    return(approvalTimeResults)
+
+
+
+
 
 
 
@@ -150,11 +173,17 @@ def main():
     a = ERsAffiliation(includeList)
     r = ERsApprovedByRRC(includeList)
     s = spendAnalysis(includeList)
+    d = approvalTime(includeList)
 
     print(a)
     print('------------')
     print(r)
     print('------------')
     print(s)
+    print('------------')
+    print(d)
+
+
 
 main()
+
