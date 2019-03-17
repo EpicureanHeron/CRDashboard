@@ -1,4 +1,6 @@
-import openpyxl, sys
+import openpyxl
+import sys
+from datetime import datetime
 
 wb = openpyxl.load_workbook('expense_analysis.xlsx')
 
@@ -26,6 +28,34 @@ def RRClist():
     else:
         includeList = nonPilotRRCs + pilotRRCs
         return(includeList)
+
+def approvalTime(includeList):
+
+    includeList = i
+    approvalTimes = []
+    exportStatusList = ['Exported/Not Paid', 'Exported/Paid', 'Exported/Partially Paid']
+
+
+
+    for row in range(4, sheet.max_row + 1):
+
+        submittedDate = (sheet['C' + str(row)].value)
+        exportedDate = (sheet['W' + str(row)].value)
+        RRC = (sheet['Y' + str(row)].value)
+        exportStatus = (sheet['V' + str(row)].value)
+
+
+        if RRC in i:
+            if exportStatus in exportStatusList:
+                #  exporteddate - submittedDate
+                # add value teo approvalTimes list
+
+                
+
+
+
+
+
         
 def spendAnalysis(includeList):
 
