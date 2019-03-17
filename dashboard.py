@@ -11,9 +11,16 @@ nonPilotRRCs = ['GPSTR', 'MNEXT', 'UMCXX', 'UMMXX', 'CCAPS', 'NURSG', 'OGCXX', '
 
 def RRClist():
     if len(sys.argv) > 1:
-    
+        includeList = []
         if sys.argv[1] == 'non-pilot':
             includeList = nonPilotRRCs
+            return(includeList)
+        else:
+            for x in sys.argv[1:]:
+                if x in pilotRRCs or x in nonPilotRRCs:
+
+                    includeList.append(x)
+
             return(includeList)
 
     else:
