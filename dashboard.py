@@ -2,7 +2,12 @@ import openpyxl
 import sys
 from datetime import datetime
 
+import csv
+
+
 wb = openpyxl.load_workbook('expense_analysis.xlsx')
+
+
 
 sheet = wb['Data']
 
@@ -65,21 +70,11 @@ def approvalTime(includeList):
     average = sum(approvalTimes)/len(approvalTimes)
 
     lessThanThreePercent = lessThanThreeDaysCounter/len(approvalTimes)
-
-
-    approvalTimeResults = {'Average': average, 'LessThan3Days': lessThanThreePercent}
+    approvalTimeResults = {'Average': average,
+                           'LessThan3Days': lessThanThreePercent}
 
     return(approvalTimeResults)
 
-
-
-
-
-
-
-
-
-        
 def spendAnalysis(includeList):
 
     i = includeList
@@ -166,6 +161,8 @@ def ERsAffiliation(includeList):
     return(affiliationData)
 
 
+
+
 def main():
 
     includeList = RRClist()
@@ -182,6 +179,20 @@ def main():
     print(s)
     print('------------')
     print(d)
+
+    name = str(datetime.now().date()) + ".csv"
+
+    with open(name, 'w') as f:  # Just use 'w' mode in 3.x
+        w = csv.writer(f)
+        w.writerow(a.keys())
+        w.writerow(a.values())
+        w.writerow(r.keys())
+        w.writerow(r.values())
+        w.writerow(s.keys())
+        w.writerow(s.values())
+        w.writerow(d.keys())
+        w.writerow(d.values())
+
 
 
 
