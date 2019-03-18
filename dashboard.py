@@ -172,31 +172,24 @@ def main():
     s = spendAnalysis(includeList)
     d = approvalTime(includeList)
 
-    print(a)
-    print('------------')
-    print(r)
-    print('------------')
-    print(s)
-    print('------------')
-    print(d)
-
     name = str(datetime.now().date()) + ".csv"
 
     with open(name, 'w') as f:  # Just use 'w' mode in 3.x
         
-       #this writes everything horizontally, which is not ideal, perfer to have column of keys, then column of values
+    
         w = csv.writer(f)
-        w.writerow(a.keys())
-        w.writerow(a.values())
-        w.writerow(r.keys())
-        w.writerow(r.values())
-        w.writerow(s.keys())
-        w.writerow(s.values())
-        w.writerow(d.keys())
-        w.writerow(d.values())
 
+        for row in a.items():
+            w.writerow(row)
+        
+        for row in r.items():
+            w.writerow(row)
 
+        for row in s.items():
+            w.writerow(row)
 
+        for row in d.items():
+            w.writerow(row)
 
 main()
 
