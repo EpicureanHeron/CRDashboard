@@ -183,6 +183,8 @@ def main():
     name = str(datetime.now().date()) + ".csv"
 
     with open(name, 'w') as f:  # Just use 'w' mode in 3.x
+        
+       #this writes everything horizontally, which is not ideal, perfer to have column of keys, then column of values
         w = csv.writer(f)
         w.writerow(a.keys())
         w.writerow(a.values())
