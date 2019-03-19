@@ -1,9 +1,11 @@
 import openpyxl
 import sys
 from datetime import datetime
-
+import time
 import csv
 
+start = time.time()
+now = datetime.now()
 
 wb = openpyxl.load_workbook('expense_analysis.xlsx')
 
@@ -194,6 +196,10 @@ def main():
 
         for row in d.items():
             w.writerow(row)
+    log = open("log.txt", "a")
+    end = time.time()
+    totalTime = (end-start)
+    log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
 
 main()
 
