@@ -5,6 +5,7 @@ import time
 import csv
 
 start = time.time() #outside of everything because needs to start as soon as script starts?
+now = datetime.now()
 
 print('Dashboard Analysis')
 
@@ -177,7 +178,7 @@ def ERsAffiliation(includeList):
 
 def main():
 
-    now = datetime.now()
+    
 
     includeList = RRClist()
 
@@ -204,10 +205,11 @@ def main():
         for row in d.items():
             w.writerow(row)
 
-    log = open("log.txt", "a")
-    end = time.time()
-    totalTime = (end-start)
-    log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
+  
     print('Done! Results in %s' %(name))
 main()
 
+log = open("log.txt", "a")
+end = time.time()
+totalTime = (end-start)
+log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
