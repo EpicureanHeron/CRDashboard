@@ -4,6 +4,11 @@ from datetime import datetime
 import time
 import csv
 
+start = time.time() #outside of everything because needs to start as soon as script starts?
+now = datetime.now()
+
+print('Dashboard Analysis')
+
 wb = openpyxl.load_workbook('expense_analysis.xlsx')
 
 sheet = wb.active
@@ -40,6 +45,8 @@ def RRClist():
         return(includeList)
 
 def approvalTime(includeList):
+
+    print('Calculating Approval Time...')
 
     i = includeList
     approvalTimes = []
@@ -82,6 +89,8 @@ def approvalTime(includeList):
 
 def spendAnalysis(includeList):
 
+    print('Analyzing Spend...')
+
     i = includeList
             
 
@@ -110,6 +119,8 @@ def spendAnalysis(includeList):
     return(spendAnalysis)    
  
 def ERsApprovedByRRC(includeList):
+
+    print('Analyzing ERs by RRC...')
 
     i = includeList
     ERsAccountedFor = []
@@ -144,6 +155,8 @@ def ERsApprovedByRRC(includeList):
     return(RRCdata)
 
 def ERsAffiliation(includeList):
+
+    print('Analyzing Affiliation Data...')
     i = includeList
     ERsAccountedFor = []
     affiliationData = {}
@@ -166,9 +179,7 @@ def ERsAffiliation(includeList):
 def main():
 
 
-    #should add this to a logging functino outside of main, call it at the top and then call it at the end
-    start = time.time()
-    now = datetime.now()
+
 
     includeList = RRClist()
 
@@ -195,10 +206,11 @@ def main():
         for row in d.items():
             w.writerow(row)
 
-    log = open("log.txt", "a")
-    end = time.time()
-    totalTime = (end-start)
-    log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
-
+  
+    print('Done! Results in %s' %(name))
 main()
 
+log = open("log.txt", "a")
+end = time.time()
+totalTime = (end-start)
+log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
