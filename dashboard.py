@@ -4,25 +4,24 @@ from datetime import datetime
 import time
 import csv
 
-start = time.time()
-now = datetime.now()
-
 wb = openpyxl.load_workbook('expense_analysis.xlsx')
 
 sheet = wb.active
 
 print('Opening workbook')
 
-pilotRRCs = ['ATHLX', 'AUXSV', 'AVPFN', 'CPPMX', 'FMXXX', 'OHRXX', 
-'OITXX', 'PSRXX', 'PUBSF', 'SUFIN', 'SVPFO', 'UHLSF', 'UMDXX', 'USERV']
-
-nonPilotRRCs = ['GPSTR', 'MNEXT', 'UMCXX', 'UMMXX', 'CCAPS', 'NURSG', 
-'OGCXX', 'UMRXX', 'PRESD', 'AUDIT', 'CSOMX', 'UEDUC', 'EQDIV', 'URELX',
- 'AESXX', 'CEHDX', 'RSRCH', 'GRADX', 'AHCSH', 'AHSCI', 'HLSCI', 'CLAXX', 
- 'CSENG', 'DESGN', 'LAWXX', 'LIBRX', 'STDAF', 'PUBHL', 'DENTX', 'HHHXX', 
- 'PHARM', 'CFANS', 'AAPRV', 'MEDXX', 'VETMD', 'CBSXX', 'RGNTS']
 
 def RRClist():
+    
+    pilotRRCs = ['ATHLX', 'AUXSV', 'AVPFN', 'CPPMX', 'FMXXX', 'OHRXX', 
+    'OITXX', 'PSRXX', 'PUBSF', 'SUFIN', 'SVPFO', 'UHLSF', 'UMDXX', 'USERV']
+
+    nonPilotRRCs = ['GPSTR', 'MNEXT', 'UMCXX', 'UMMXX', 'CCAPS', 'NURSG', 
+    'OGCXX', 'UMRXX', 'PRESD', 'AUDIT', 'CSOMX', 'UEDUC', 'EQDIV', 'URELX',
+    'AESXX', 'CEHDX', 'RSRCH', 'GRADX', 'AHCSH', 'AHSCI', 'HLSCI', 'CLAXX', 
+    'CSENG', 'DESGN', 'LAWXX', 'LIBRX', 'STDAF', 'PUBHL', 'DENTX', 'HHHXX', 
+    'PHARM', 'CFANS', 'AAPRV', 'MEDXX', 'VETMD', 'CBSXX', 'RGNTS']
+
     if len(sys.argv) > 1:
         includeList = []
         if sys.argv[1] == 'non-pilot':
@@ -110,8 +109,6 @@ def spendAnalysis(includeList):
 
     return(spendAnalysis)    
  
-
-# ERsApprovedByRRC and ERsAffiliation should be combined, speed things up if only need to create the ERs Accounted For once
 def ERsApprovedByRRC(includeList):
 
     i = includeList
@@ -166,10 +163,10 @@ def ERsAffiliation(includeList):
     affiliationData.setdefault('Total Submitted', TotalSubmitted)
     return(affiliationData)
 
-
-
-
 def main():
+
+    start = time.time()
+    now = datetime.now()
 
     includeList = RRClist()
 
@@ -181,7 +178,6 @@ def main():
     name = str(datetime.now().date()) + ".csv"
 
     with open(name, 'w') as f:  # Just use 'w' mode in 3.x
-        
     
         w = csv.writer(f)
 
@@ -196,6 +192,7 @@ def main():
 
         for row in d.items():
             w.writerow(row)
+
     log = open("log.txt", "a")
     end = time.time()
     totalTime = (end-start)
