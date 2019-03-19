@@ -112,7 +112,7 @@ def ERsApprovedByRRC(includeList):
     ERsAccountedFor = []
     RRCdata = {}
     TotalApproved = 0
-    affiliationData = {}
+  
 
 
     for row in range(4, sheet.max_row + 1):
