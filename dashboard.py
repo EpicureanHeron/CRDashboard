@@ -7,14 +7,18 @@ import csv
 
 wb = openpyxl.load_workbook('expense_analysis.xlsx')
 
-
-# change this to select the only sheet, which I have previously renamed as 'data' but it is usually some time stamp, think there is a notion of 'active' to select
 sheet = wb.active
 
 print('Opening workbook')
 
-pilotRRCs = ['ATHLX', 'AUXSV', 'AVPFN', 'CPPMX', 'FMXXX', 'OHRXX', 'OITXX', 'PSRXX', 'PUBSF', 'SUFIN', 'SVPFO', 'UHLSF', 'UMDXX', 'USERV']
-nonPilotRRCs = ['GPSTR', 'MNEXT', 'UMCXX', 'UMMXX', 'CCAPS', 'NURSG', 'OGCXX', 'UMRXX', 'PRESD', 'AUDIT', 'CSOMX', 'UEDUC', 'EQDIV', 'URELX', 'AESXX', 'CEHDX', 'RSRCH', 'GRADX', 'AHCSH', 'AHSCI', 'HLSCI', 'CLAXX', 'CSENG', 'DESGN', 'LAWXX', 'LIBRX', 'STDAF', 'PUBHL', 'DENTX', 'HHHXX', 'PHARM', 'CFANS', 'AAPRV', 'MEDXX', 'VETMD', 'CBSXX', 'RGNTS']
+pilotRRCs = ['ATHLX', 'AUXSV', 'AVPFN', 'CPPMX', 'FMXXX', 'OHRXX', 
+'OITXX', 'PSRXX', 'PUBSF', 'SUFIN', 'SVPFO', 'UHLSF', 'UMDXX', 'USERV']
+
+nonPilotRRCs = ['GPSTR', 'MNEXT', 'UMCXX', 'UMMXX', 'CCAPS', 'NURSG', 
+'OGCXX', 'UMRXX', 'PRESD', 'AUDIT', 'CSOMX', 'UEDUC', 'EQDIV', 'URELX',
+ 'AESXX', 'CEHDX', 'RSRCH', 'GRADX', 'AHCSH', 'AHSCI', 'HLSCI', 'CLAXX', 
+ 'CSENG', 'DESGN', 'LAWXX', 'LIBRX', 'STDAF', 'PUBHL', 'DENTX', 'HHHXX', 
+ 'PHARM', 'CFANS', 'AAPRV', 'MEDXX', 'VETMD', 'CBSXX', 'RGNTS']
 
 def RRClist():
     if len(sys.argv) > 1:
@@ -136,7 +140,7 @@ def ERsApprovedByRRC(includeList):
                     RRCdata[RRC] += 1 
                
 
-    RRCdata.setdefault('Total', TotalApproved)
+    RRCdata.setdefault('Total Approved', TotalApproved)
 
     return(RRCdata)
 
@@ -145,7 +149,7 @@ def ERsAffiliation(includeList):
     ERsAccountedFor = []
     affiliationData = {}
     
-    TotalApproved = 0
+    TotalSubmitted = 0
     for row in range(4, sheet.max_row + 1):
         ERID = (sheet['B' + str(row)].value)
         affl = (sheet['Z' + str(row)].value)
@@ -153,11 +157,11 @@ def ERsAffiliation(includeList):
         if RRC in i:
             if ERID not in ERsAccountedFor:
                 affiliationData.setdefault(affl, 0 )
-                TotalApproved += 1
+                TotalSubmitted += 1
                 ERsAccountedFor.append(ERID)
                 affiliationData[affl] +=1
 
-    affiliationData.setdefault('Total', TotalApproved)
+    affiliationData.setdefault('Total Submitted', TotalSubmitted)
     return(affiliationData)
 
 
