@@ -165,6 +165,8 @@ def ERsAffiliation(includeList):
 
 def main():
 
+
+    #should add this to a logging functino outside of main, call it at the top and then call it at the end
     start = time.time()
     now = datetime.now()
 
