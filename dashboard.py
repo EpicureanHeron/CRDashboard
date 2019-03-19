@@ -9,7 +9,7 @@ wb = openpyxl.load_workbook('expense_analysis.xlsx')
 
 
 # change this to select the only sheet, which I have previously renamed as 'data' but it is usually some time stamp, think there is a notion of 'active' to select
-sheet = wb['Data']
+sheet = wb.active
 
 print('Opening workbook')
 
