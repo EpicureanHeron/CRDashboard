@@ -9,11 +9,15 @@ now = datetime.now()
 
 print('Dashboard Analysis')
 
-wb = openpyxl.load_workbook('expense_analysis.xlsx')
+expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
+submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
 
-sheet = wb.active
+sheet = expenseAnalysis.active
+sheet2 = submitted.active
 
 print('Opening workbook')
+
+
 
 
 def RRClist():
@@ -43,6 +47,40 @@ def RRClist():
     else:
         includeList = nonPilotRRCs + pilotRRCs
         return(includeList)
+
+def submittedERsByDelegates (includeList):
+
+    print("Calculating breakdown of ERs submitted by ER owner and by delegates...")
+
+    i = includeList
+    ERsByDelegates = 0
+    ERsByExpenseOwners = 0
+    RRCdata = {}
+
+    for row in range(4, sheet2.max_row + 1):
+        expenseOwner = (sheet2['E' + str(row)].value)
+        expenseCreator = (sheet2['H' + str(row)].value)
+        RRC = (sheet2['I' + str(row)].value)
+
+        if RRC in i:
+            if expenseCreator == expenseOwner:
+
+                RRCdata.setdefault(RRC + ' by EO', 0)
+                RRCdata[RRC + ' by EO'] += 1 
+                ERsByExpenseOwners += 1
+            else: 
+                RRCdata.setdefault(RRC + ' by delegate', 0)
+                RRCdata[RRC + ' by delegate'] += 1 
+                ERsByDelegates += 1
+
+    RRCdata.setdefault('Total by delegates', ERsByDelegates)
+    RRCdata.setdefault('Total by expense owners', ERsByExpenseOwners)
+    
+    print(RRCdata)
+    print(ERsByDelegates)
+    print(ERsByExpenseOwners)
+    return(RRCdata)
+
 
 def approvalTime(includeList):
 
@@ -187,6 +225,7 @@ def main():
     r = ERsApprovedByRRC(includeList)
     s = spendAnalysis(includeList)
     d = approvalTime(includeList)
+    e = submittedERsByDelegates(includeList)
 
     name = str(datetime.now().date()) + ".csv"
 
@@ -205,6 +244,12 @@ def main():
 
         for row in d.items():
             w.writerow(row)
+
+        for row in e.items():
+            w.writerow(row)
+
+        
+
 
   
     print('Done! Results in %s' %(name))
