@@ -1,22 +1,36 @@
 import openpyxl
 import sys
 from datetime import datetime
-
+import time
 import csv
 
+start = time.time() #outside of everything because needs to start as soon as script starts?
+now = datetime.now()
 
-wb = openpyxl.load_workbook('expense_analysis.xlsx')
+print('Dashboard Analysis')
 
+expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
+submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
 
-# change this to select the only sheet, which I have previously renamed as 'data' but it is usually some time stamp, think there is a notion of 'active' to select
-sheet = wb.active
+sheet = expenseAnalysis.active
+sheet2 = submitted.active
 
 print('Opening workbook')
 
-pilotRRCs = ['ATHLX', 'AUXSV', 'AVPFN', 'CPPMX', 'FMXXX', 'OHRXX', 'OITXX', 'PSRXX', 'PUBSF', 'SUFIN', 'SVPFO', 'UHLSF', 'UMDXX', 'USERV']
-nonPilotRRCs = ['GPSTR', 'MNEXT', 'UMCXX', 'UMMXX', 'CCAPS', 'NURSG', 'OGCXX', 'UMRXX', 'PRESD', 'AUDIT', 'CSOMX', 'UEDUC', 'EQDIV', 'URELX', 'AESXX', 'CEHDX', 'RSRCH', 'GRADX', 'AHCSH', 'AHSCI', 'HLSCI', 'CLAXX', 'CSENG', 'DESGN', 'LAWXX', 'LIBRX', 'STDAF', 'PUBHL', 'DENTX', 'HHHXX', 'PHARM', 'CFANS', 'AAPRV', 'MEDXX', 'VETMD', 'CBSXX', 'RGNTS']
+
+
 
 def RRClist():
+    
+    pilotRRCs = ['ATHLX', 'AUXSV', 'AVPFN', 'CPPMX', 'FMXXX', 'OHRXX', 
+    'OITXX', 'PSRXX', 'PUBSF', 'SUFIN', 'SVPFO', 'UHLSF', 'UMDXX', 'USERV']
+
+    nonPilotRRCs = ['GPSTR', 'MNEXT', 'UMCXX', 'UMMXX', 'CCAPS', 'NURSG', 
+    'OGCXX', 'UMRXX', 'PRESD', 'AUDIT', 'CSOMX', 'UEDUC', 'EQDIV', 'URELX',
+    'AESXX', 'CEHDX', 'RSRCH', 'GRADX', 'AHCSH', 'AHSCI', 'HLSCI', 'CLAXX', 
+    'CSENG', 'DESGN', 'LAWXX', 'LIBRX', 'STDAF', 'PUBHL', 'DENTX', 'HHHXX', 
+    'PHARM', 'CFANS', 'AAPRV', 'MEDXX', 'VETMD', 'CBSXX', 'RGNTS']
+
     if len(sys.argv) > 1:
         includeList = []
         if sys.argv[1] == 'non-pilot':
@@ -34,7 +48,43 @@ def RRClist():
         includeList = nonPilotRRCs + pilotRRCs
         return(includeList)
 
+def submittedERsByDelegates (includeList):
+
+    print("Calculating breakdown of ERs submitted by ER owner and by delegates...")
+
+    i = includeList
+    ERsByDelegates = 0
+    ERsByExpenseOwners = 0
+    RRCdata = {}
+
+    for row in range(4, sheet2.max_row + 1):
+        expenseOwner = (sheet2['E' + str(row)].value)
+        expenseCreator = (sheet2['H' + str(row)].value)
+        RRC = (sheet2['I' + str(row)].value)
+
+        if RRC in i:
+            if expenseCreator == expenseOwner:
+
+                RRCdata.setdefault(RRC + ' by EO', 0)
+                RRCdata[RRC + ' by EO'] += 1 
+                ERsByExpenseOwners += 1
+            else: 
+                RRCdata.setdefault(RRC + ' by delegate', 0)
+                RRCdata[RRC + ' by delegate'] += 1 
+                ERsByDelegates += 1
+
+    RRCdata.setdefault('Total by delegates', ERsByDelegates)
+    RRCdata.setdefault('Total by expense owners', ERsByExpenseOwners)
+    
+    print(RRCdata)
+    print(ERsByDelegates)
+    print(ERsByExpenseOwners)
+    return(RRCdata)
+
+
 def approvalTime(includeList):
+
+    print('Calculating Approval Time...')
 
     i = includeList
     approvalTimes = []
@@ -77,6 +127,8 @@ def approvalTime(includeList):
 
 def spendAnalysis(includeList):
 
+    print('Analyzing Spend...')
+
     i = includeList
             
 
@@ -104,15 +156,15 @@ def spendAnalysis(includeList):
 
     return(spendAnalysis)    
  
-
-# ERsApprovedByRRC and ERsAffiliation should be combined, speed things up if only need to create the ERs Accounted For once
 def ERsApprovedByRRC(includeList):
+
+    print('Analyzing ERs by RRC...')
 
     i = includeList
     ERsAccountedFor = []
     RRCdata = {}
     TotalApproved = 0
-    affiliationData = {}
+  
 
 
     for row in range(4, sheet.max_row + 1):
@@ -136,16 +188,18 @@ def ERsApprovedByRRC(includeList):
                     RRCdata[RRC] += 1 
                
 
-    RRCdata.setdefault('Total', TotalApproved)
+    RRCdata.setdefault('Total Approved', TotalApproved)
 
     return(RRCdata)
 
 def ERsAffiliation(includeList):
+
+    print('Analyzing Affiliation Data...')
     i = includeList
     ERsAccountedFor = []
     affiliationData = {}
     
-    TotalApproved = 0
+    TotalSubmitted = 0
     for row in range(4, sheet.max_row + 1):
         ERID = (sheet['B' + str(row)].value)
         affl = (sheet['Z' + str(row)].value)
@@ -153,17 +207,17 @@ def ERsAffiliation(includeList):
         if RRC in i:
             if ERID not in ERsAccountedFor:
                 affiliationData.setdefault(affl, 0 )
-                TotalApproved += 1
+                TotalSubmitted += 1
                 ERsAccountedFor.append(ERID)
                 affiliationData[affl] +=1
 
-    affiliationData.setdefault('Total', TotalApproved)
+    affiliationData.setdefault('Total Submitted', TotalSubmitted)
     return(affiliationData)
 
-
-
-
 def main():
+
+
+
 
     includeList = RRClist()
 
@@ -171,11 +225,11 @@ def main():
     r = ERsApprovedByRRC(includeList)
     s = spendAnalysis(includeList)
     d = approvalTime(includeList)
+    e = submittedERsByDelegates(includeList)
 
     name = str(datetime.now().date()) + ".csv"
 
     with open(name, 'w') as f:  # Just use 'w' mode in 3.x
-        
     
         w = csv.writer(f)
 
@@ -191,5 +245,17 @@ def main():
         for row in d.items():
             w.writerow(row)
 
+        for row in e.items():
+            w.writerow(row)
+
+        
+
+
+  
+    print('Done! Results in %s' %(name))
 main()
 
+log = open("log.txt", "a")
+end = time.time()
+totalTime = (end-start)
+log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
