@@ -4,8 +4,8 @@ from datetime import datetime
 import time
 import csv
 
-# start = time.time() #outside of everything because needs to start as soon as script starts?
-# now = datetime.now()
+start = time.time() #outside of everything because needs to start as soon as script starts?
+now = datetime.now()
 
 print('Beginning Dashboard Analysis...')
 
@@ -51,7 +51,7 @@ def RRClist():
         return(includeList)
 
 def delegatesSetUpAnalysis(includeList):
-    print('Analyzing delegates')
+    print('Analyzing expense owners with delegates set up...')
     i = includeList
     EOhasDelegate = 0
     RRCdata = {}
@@ -61,15 +61,14 @@ def delegatesSetUpAnalysis(includeList):
         RRC = (sheet3['C' + str(row)].value)
 
         if RRC in i:
-            print(emailOfEO)
             if emailOfEO != '':
                 EOhasDelegate += 1
                 RRCdata.setdefault(RRC, 0)
                 RRCdata[RRC] += 1
-                print('new count of EOs with delegates since %s has a delegate is %s' %(emailOfEO, str(EOhasDelegate)))
+               
 
-    print(EOhasDelegate)
-    print(RRCdata)
+    RRCdata.setdefault('Total EOs with Delegates', EOhasDelegate)
+    return(RRCdata)
 
 
 def submittedERsByDelegates(includeList):
@@ -236,9 +235,6 @@ def ERsAffiliation(includeList):
 
 def main():
 
-
-
-
     includeList = RRClist()
 
     a = ERsAffiliation(includeList)
@@ -246,38 +242,53 @@ def main():
     s = spendAnalysis(includeList)
     d = approvalTime(includeList)
     e = submittedERsByDelegates(includeList)
+    d2 = delegatesSetUpAnalysis(includeList)
 
     name = str(datetime.now().date()) + ".csv"
     print('Preparing results...')
     with open(name, 'w') as f:  # Just use 'w' mode in 3.x
     
         w = csv.writer(f)
+        w.writerow('ERS by Affilation')
 
         for row in a.items():
             w.writerow(row)
         
+        w.writerow('------------')
+        w.writerow('ERs approved by RRC')
+        
         for row in r.items():
             w.writerow(row)
 
+        w.writerow('------------')
+        w.writerow('Spend Analysis')
+
         for row in s.items():
             w.writerow(row)
+        
+        w.writerow('------------')
+        w.writerow('Approval Time')
 
         for row in d.items():
             w.writerow(row)
+        
+        w.writerow('------------')
+        w.writerow('Submitted ERs')
 
         for row in e.items():
             w.writerow(row)
-
         
+        w.writerow('------------')
+        w.writerow('Delegates by Expense Owners')
 
-
+        for row in d2.items():
+            w.writerow(row)
   
     print('Done! Results in %s' %(name))
-#main()
+main()
 
-# log = open("log.txt", "a")
-# end = time.time()
-# totalTime = (end-start)
-# log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
-includelist = RRClist()
-delegatesSetUpAnalysis(includelist)
+log = open("log.txt", "a")
+end = time.time()
+totalTime = (end-start)
+print('The script took %s seconds to run' % (totalTime))
+log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n')
