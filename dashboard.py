@@ -4,18 +4,20 @@ from datetime import datetime
 import time
 import csv
 
-start = time.time() #outside of everything because needs to start as soon as script starts?
-now = datetime.now()
+# start = time.time() #outside of everything because needs to start as soon as script starts?
+# now = datetime.now()
 
-print('Dashboard Analysis')
+print('Beginning Dashboard Analysis...')
 
 expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
 submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
+delegatesSetUp = openpyxl.load_workbook('Who_has_delegates_set_up.xlsx')
 
 sheet = expenseAnalysis.active
 sheet2 = submitted.active
+sheet3 = delegatesSetUp.active
 
-print('Opening workbook')
+print('Spreadsheets are ready...')
 
 
 
@@ -48,7 +50,29 @@ def RRClist():
         includeList = nonPilotRRCs + pilotRRCs
         return(includeList)
 
-def submittedERsByDelegates (includeList):
+def delegatesSetUpAnalysis(includeList):
+    print('Analyzing delegates')
+    i = includeList
+    EOhasDelegate = 0
+    RRCdata = {}
+
+    for row in range(2, sheet3.max_row + 1):
+        emailOfEO = (sheet3['E' + str(row)].value)
+        RRC = (sheet3['C' + str(row)].value)
+
+        if RRC in i:
+            print(emailOfEO)
+            if emailOfEO != '':
+                EOhasDelegate += 1
+                RRCdata.setdefault(RRC, 0)
+                RRCdata[RRC] += 1
+                print('new count of EOs with delegates since %s has a delegate is %s' %(emailOfEO, str(EOhasDelegate)))
+
+    print(EOhasDelegate)
+    print(RRCdata)
+
+
+def submittedERsByDelegates(includeList):
 
     print("Calculating breakdown of ERs submitted by ER owner and by delegates...")
 
@@ -75,10 +99,6 @@ def submittedERsByDelegates (includeList):
 
     RRCdata.setdefault('Total by delegates', ERsByDelegates)
     RRCdata.setdefault('Total by expense owners', ERsByExpenseOwners)
-    
-    print(RRCdata)
-    print(ERsByDelegates)
-    print(ERsByExpenseOwners)
     return(RRCdata)
 
 
@@ -228,7 +248,7 @@ def main():
     e = submittedERsByDelegates(includeList)
 
     name = str(datetime.now().date()) + ".csv"
-
+    print('Preparing results...')
     with open(name, 'w') as f:  # Just use 'w' mode in 3.x
     
         w = csv.writer(f)
@@ -253,9 +273,11 @@ def main():
 
   
     print('Done! Results in %s' %(name))
-main()
+#main()
 
-log = open("log.txt", "a")
-end = time.time()
-totalTime = (end-start)
-log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
+# log = open("log.txt", "a")
+# end = time.time()
+# totalTime = (end-start)
+# log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
+includelist = RRClist()
+delegatesSetUpAnalysis(includelist)
