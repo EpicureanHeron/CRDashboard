@@ -4,20 +4,22 @@ from datetime import datetime
 import time
 import csv
 
-# start = time.time() #outside of everything because needs to start as soon as script starts?
-# now = datetime.now()
+start = time.time() #outside of everything because needs to start as soon as script starts?
+now = datetime.now()
 
 print('Beginning Dashboard Analysis...')
 
-# expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
-# submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
-# delegatesSetUp = openpyxl.load_workbook('Who_has_delegates_set_up.xlsx')
+expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
+submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
+delegatesSetUp = openpyxl.load_workbook('Who_has_delegates_set_up.xlsx')
 personReport = openpyxl.load_workbook('reference-person_report.xlsx')
+approvalMethod = openpyxl.load_workbook('Beth_Approval_Method.xlsx')
 
-# sheet = expenseAnalysis.active
-# sheet2 = submitted.active
-# sheet3 = delegatesSetUp.active
+sheet = expenseAnalysis.active
+sheet2 = submitted.active
+sheet3 = delegatesSetUp.active
 sheet4 = personReport.active
+sheet5 = approvalMethod.active
 
 print('Spreadsheets are ready...')
 
@@ -51,6 +53,55 @@ def RRClist():
     else:
         includeList = nonPilotRRCs + pilotRRCs
         return(includeList)
+
+def approvalAnalysis(includeList):
+    print("Analyzing Approvals...")
+    i = includeList
+    totalApprovers = 0
+    totalEmail = 0
+    totalSystem = 0
+    uniqueApprovers = []
+    RRCdata = {}
+    
+    
+    for row in range(2, sheet5.max_row + 1):
+       
+        #print('passed')
+        RRC = (sheet5['I' + str(row)].value)
+        method = (sheet5['F' + str(row)].value)
+        approverEmail = (sheet5['H' + str(row)].value) 
+
+        if RRC in i:
+           # print('%s %s %s' %(RRC, method, approverEmail))
+            if method == 'MERC':
+               # print('merc')
+                totalSystem += 1
+                RRCdata.setdefault(RRC + ' by system', 0)
+                RRCdata[RRC + ' by system'] += 1 
+                if approverEmail not in uniqueApprovers:
+                    uniqueApprovers.append(approverEmail)
+                    totalApprovers += 1
+
+            elif method == 'EMAI':
+           
+                totalEmail += 1
+                RRCdata.setdefault(RRC + ' by email', 0)
+                RRCdata[RRC + ' by email'] += 1 
+                if approverEmail not in uniqueApprovers:
+                    uniqueApprovers.append(approverEmail)
+                    totalApprovers += 1
+            else: 
+                if approverEmail not in uniqueApprovers:
+                    uniqueApprovers.append(approverEmail)
+                    totalApprovers += 1
+
+    RRCdata.setdefault('By Email', totalEmail)
+    RRCdata.setdefault('By System', totalSystem)
+    RRCdata.setdefault('Unique approvers', totalApprovers)
+
+    return(RRCdata)
+
+
 
 def personAnalysis(includeList):
     print('Analyzing people data...')
@@ -310,7 +361,7 @@ def main():
 
 def test():
     includeList = RRClist()
-    x = personAnalysis(includeList)
+    x = approvalAnalysis(includeList)
     print(x)
 
 #main()
