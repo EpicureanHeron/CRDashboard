@@ -4,18 +4,20 @@ from datetime import datetime
 import time
 import csv
 
-start = time.time() #outside of everything because needs to start as soon as script starts?
-now = datetime.now()
+# start = time.time() #outside of everything because needs to start as soon as script starts?
+# now = datetime.now()
 
 print('Beginning Dashboard Analysis...')
 
-expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
-submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
-delegatesSetUp = openpyxl.load_workbook('Who_has_delegates_set_up.xlsx')
+# expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
+# submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
+# delegatesSetUp = openpyxl.load_workbook('Who_has_delegates_set_up.xlsx')
+personReport = openpyxl.load_workbook('reference-person_report.xlsx')
 
-sheet = expenseAnalysis.active
-sheet2 = submitted.active
-sheet3 = delegatesSetUp.active
+# sheet = expenseAnalysis.active
+# sheet2 = submitted.active
+# sheet3 = delegatesSetUp.active
+sheet4 = personReport.active
 
 print('Spreadsheets are ready...')
 
@@ -49,6 +51,26 @@ def RRClist():
     else:
         includeList = nonPilotRRCs + pilotRRCs
         return(includeList)
+
+def personAnalysis(includeList):
+    print('Analyzing people data...')
+    i = includeList
+    totalPerson = 0
+    RRCdata = {}
+
+    for row in range(4, sheet4.max_row+1):
+
+        RRC = (sheet4['AB' + str(row)].value)
+
+        if RRC in i:
+            RRCdata.setdefault(RRC, 0)
+            RRCdata[RRC] += 1
+            totalPerson += 1
+
+    RRCdata.setdefault('Total Count', totalPerson)
+
+    return(RRCdata)
+
 
 def delegatesSetUpAnalysis(includeList):
     print('Analyzing expense owners with delegates set up...')
@@ -285,10 +307,17 @@ def main():
             w.writerow(row)
   
     print('Done! Results in %s' %(name))
-main()
 
-log = open("log.txt", "a")
-end = time.time()
-totalTime = (end-start)
-print('The script took %s seconds to run' % (totalTime))
-log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n')
+def test():
+    includeList = RRClist()
+    x = personAnalysis(includeList)
+    print(x)
+
+#main()
+test()
+
+# log = open("log.txt", "a")
+# end = time.time()
+# totalTime = (end-start)
+# print('The script took %s seconds to run' % (totalTime))
+# log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n')
