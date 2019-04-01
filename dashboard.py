@@ -7,15 +7,21 @@ import csv
 start = time.time() #outside of everything because needs to start as soon as script starts?
 now = datetime.now()
 
-print('Dashboard Analysis')
+print('Beginning Dashboard Analysis...')
 
 expenseAnalysis = openpyxl.load_workbook('expense_analysis.xlsx')
 submitted = openpyxl.load_workbook('expense-submitted_reports.xlsx')
+delegatesSetUp = openpyxl.load_workbook('Who_has_delegates_set_up.xlsx')
+personReport = openpyxl.load_workbook('reference-person_report.xlsx')
+approvalMethod = openpyxl.load_workbook('Beth_Approval_Method.xlsx')
 
 sheet = expenseAnalysis.active
 sheet2 = submitted.active
+sheet3 = delegatesSetUp.active
+sheet4 = personReport.active
+sheet5 = approvalMethod.active
 
-print('Opening workbook')
+print('Spreadsheets are ready...')
 
 
 
@@ -48,7 +54,97 @@ def RRClist():
         includeList = nonPilotRRCs + pilotRRCs
         return(includeList)
 
-def submittedERsByDelegates (includeList):
+def approvalAnalysis(includeList):
+    print("Analyzing Approvals...")
+    i = includeList
+    totalApprovers = 0
+    totalEmail = 0
+    totalSystem = 0
+    uniqueApprovers = []
+    RRCdata = {}
+    
+    
+    for row in range(2, sheet5.max_row + 1):
+       
+        #print('passed')
+        RRC = (sheet5['I' + str(row)].value)
+        method = (sheet5['F' + str(row)].value)
+        approverEmail = (sheet5['H' + str(row)].value) 
+
+        if RRC in i:
+           # print('%s %s %s' %(RRC, method, approverEmail))
+            if method == 'MERC':
+               # print('merc')
+                totalSystem += 1
+                RRCdata.setdefault(RRC + ' by system', 0)
+                RRCdata[RRC + ' by system'] += 1 
+                if approverEmail not in uniqueApprovers:
+                    uniqueApprovers.append(approverEmail)
+                    totalApprovers += 1
+
+            elif method == 'EMAI':
+           
+                totalEmail += 1
+                RRCdata.setdefault(RRC + ' by email', 0)
+                RRCdata[RRC + ' by email'] += 1 
+                if approverEmail not in uniqueApprovers:
+                    uniqueApprovers.append(approverEmail)
+                    totalApprovers += 1
+            else: 
+                if approverEmail not in uniqueApprovers:
+                    uniqueApprovers.append(approverEmail)
+                    totalApprovers += 1
+
+    RRCdata.setdefault('By Email', totalEmail)
+    RRCdata.setdefault('By System', totalSystem)
+    RRCdata.setdefault('Unique approvers', totalApprovers)
+
+    return(RRCdata)
+
+
+
+def personAnalysis(includeList):
+    print('Analyzing people data...')
+    i = includeList
+    totalPerson = 0
+    RRCdata = {}
+
+    for row in range(4, sheet4.max_row+1):
+
+        RRC = (sheet4['AB' + str(row)].value)
+
+        if RRC in i:
+            RRCdata.setdefault(RRC, 0)
+            RRCdata[RRC] += 1
+            totalPerson += 1
+
+    RRCdata.setdefault('Total Count', totalPerson)
+
+    return(RRCdata)
+
+
+def delegatesSetUpAnalysis(includeList):
+    print('Analyzing expense owners with delegates set up...')
+    i = includeList
+    EOhasDelegate = 0
+    RRCdata = {}
+
+    for row in range(2, sheet3.max_row + 1):
+        emailOfEO = (sheet3['E' + str(row)].value)
+        RRC = (sheet3['C' + str(row)].value)
+
+        if RRC in i:
+            if emailOfEO != '':
+                EOhasDelegate += 1
+                RRCdata.setdefault(RRC, 0)
+                RRCdata[RRC] += 1
+               
+
+    RRCdata.setdefault('Total EOs with Delegates', EOhasDelegate)
+    return(RRCdata)
+
+
+def submittedERsByDelegates(includeList):
 
     print("Calculating breakdown of ERs submitted by ER owner and by delegates...")
 
@@ -75,10 +171,6 @@ def submittedERsByDelegates (includeList):
 
     RRCdata.setdefault('Total by delegates', ERsByDelegates)
     RRCdata.setdefault('Total by expense owners', ERsByExpenseOwners)
-    
-    print(RRCdata)
-    print(ERsByDelegates)
-    print(ERsByExpenseOwners)
     return(RRCdata)
 
 
@@ -216,9 +308,6 @@ def ERsAffiliation(includeList):
 
 def main():
 
-
-
-
     includeList = RRClist()
 
     a = ERsAffiliation(includeList)
@@ -226,36 +315,75 @@ def main():
     s = spendAnalysis(includeList)
     d = approvalTime(includeList)
     e = submittedERsByDelegates(includeList)
+    d2 = delegatesSetUpAnalysis(includeList)
+    p = personAnalysis(includeList)
+    a2 = approvalAnalysis(includeList)
 
     name = str(datetime.now().date()) + ".csv"
-
+    print('Preparing results...')
     with open(name, 'w') as f:  # Just use 'w' mode in 3.x
     
         w = csv.writer(f)
+        w.writerow('ERS by Affilation')
 
         for row in a.items():
             w.writerow(row)
         
+        w.writerow('------------')
+        w.writerow('ERs approved by RRC')
+        
         for row in r.items():
             w.writerow(row)
 
+        w.writerow('------------')
+        w.writerow('Spend Analysis')
+
         for row in s.items():
             w.writerow(row)
+        
+        w.writerow('------------')
+        w.writerow('Approval Time')
 
         for row in d.items():
             w.writerow(row)
+        
+        w.writerow('------------')
+        w.writerow('Submitted ERs')
 
         for row in e.items():
             w.writerow(row)
-
         
+        w.writerow('------------')
+        w.writerow('Delegates by Expense Owners')
 
+        for row in d2.items():
+            w.writerow(row)
 
-  
+        w.writerow('------------')
+        w.writerow('Person Analysis')
+
+        for row in p.items():
+            w.writerow(row)
+
+        w.writerow('------------')
+        w.writerow('Approval Analysis')
+
+        for row in a2.items():
+            w.writerow(row)
+
+    
     print('Done! Results in %s' %(name))
+
+def test():
+    includeList = RRClist()
+    x = approvalAnalysis(includeList)
+    print(x)
+
 main()
+# test()
 
 log = open("log.txt", "a")
 end = time.time()
 totalTime = (end-start)
-log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n') 
+print('The script took %s seconds to run' % (totalTime))
+log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n')
