@@ -316,6 +316,8 @@ def main():
     d = approvalTime(includeList)
     e = submittedERsByDelegates(includeList)
     d2 = delegatesSetUpAnalysis(includeList)
+    p = personAnalysis(includeList)
+    a2 = approvalAnalysis(includeList)
 
     name = str(datetime.now().date()) + ".csv"
     print('Preparing results...')
@@ -356,7 +358,20 @@ def main():
 
         for row in d2.items():
             w.writerow(row)
-  
+
+        w.writerow('------------')
+        w.writerow('Person Analysis')
+
+        for row in p.items():
+            w.writerow(row)
+
+        w.writerow('------------')
+        w.writerow('Approval Analysis')
+
+        for row in a2.items():
+            w.writerow(row)
+
+    
     print('Done! Results in %s' %(name))
 
 def test():
@@ -364,11 +379,11 @@ def test():
     x = approvalAnalysis(includeList)
     print(x)
 
-#main()
-test()
+main()
+# test()
 
-# log = open("log.txt", "a")
-# end = time.time()
-# totalTime = (end-start)
-# print('The script took %s seconds to run' % (totalTime))
-# log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n')
+log = open("log.txt", "a")
+end = time.time()
+totalTime = (end-start)
+print('The script took %s seconds to run' % (totalTime))
+log.write("date: " +str(now) + ", runtime: " + str(totalTime) + '\n')
