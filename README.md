@@ -47,3 +47,19 @@ Those reports are generated from the Chrome River Analytics Tool and must be for
 ## UM > My Content > Copied from Beth: Approval Method
 * Run report, automatically outputs an Excel file
 * Name of the file must be `Beth_Approval_Method.xlsx`
+
+## Running on Command Line
+
+This script can take a command line argument of an RRC or one special keyword
+
+Running the following from the command line will pull all data
+`python dashboard.py`
+
+Running so only non-pilot units are captured in the analysis
+`python dashboard.py non-pilot`
+
+Running for only one RRC
+`python dashboard.py ATHLX`
+
+Running for multiple RRCs (can take multiple arguments with no cap)
+`python dashboard.py ATHLX UMDXX UMCXX` 
