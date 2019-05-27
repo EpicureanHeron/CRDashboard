@@ -321,52 +321,52 @@ def main():
 
     name = str(datetime.now().date()) + ".csv"
     print('Preparing results...')
-    with open(name, 'w') as f:  # Just use 'w' mode in 3.x
+    with open(name, 'w', newline='') as f:  # Just use 'w' mode in 3.x
     
         w = csv.writer(f)
-        w.writerow('ERS by Affilation')
+        w.writerow(['ERS by Affilation'])
 
         for row in a.items():
             w.writerow(row)
         
-        w.writerow('------------')
-        w.writerow('ERs approved by RRC')
+        w.writerow(['------------'])
+        w.writerow(['ERs approved by RRC'])
         
         for row in r.items():
             w.writerow(row)
 
-        w.writerow('------------')
-        w.writerow('Spend Analysis')
+        w.writerow(['------------'])
+        w.writerow(['Spend Analysis'])
 
         for row in s.items():
             w.writerow(row)
         
-        w.writerow('------------')
-        w.writerow('Approval Time')
+        w.writerow(['------------'])
+        w.writerow(['Approval Time'])
 
         for row in d.items():
             w.writerow(row)
         
-        w.writerow('------------')
-        w.writerow('Submitted ERs')
+        w.writerow(['------------'])
+        w.writerow(['Submitted ERs'])
 
         for row in e.items():
             w.writerow(row)
         
-        w.writerow('------------')
-        w.writerow('Delegates by Expense Owners')
+        w.writerow(['------------'])
+        w.writerow(['Delegates by Expense Owners'])
 
         for row in d2.items():
             w.writerow(row)
 
-        w.writerow('------------')
-        w.writerow('Person Analysis')
+        w.writerow(['------------'])
+        w.writerow(['Person Analysis'])
 
         for row in p.items():
             w.writerow(row)
 
-        w.writerow('------------')
-        w.writerow('Approval Analysis')
+        w.writerow(['------------'])
+        w.writerow(['Approval Analysis'])
 
         for row in a2.items():
             w.writerow(row)
